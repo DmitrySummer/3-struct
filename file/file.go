@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+type File interface {
+	WriteFile([]byte, string)
+}
+
 // Функция записи файла и проверка является ли файл JSON
 func WriteFile(content []byte, name string) error {
 	if !json.Valid(content) {

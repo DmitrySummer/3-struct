@@ -6,6 +6,11 @@ import (
 	"os"
 )
 
+type FileStorage interface {
+	ReadFile(string) ([]byte, error)
+	SaveFile(string, map[string]interface{})
+}
+
 // Функция для прочтения файла
 func ReadFile(name string) ([]byte, error) {
 	data, err := os.ReadFile(name)
