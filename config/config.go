@@ -1,19 +1,29 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 type Config struct {
 	Key string
 }
 
-func (conf *Config) ReadKey(keyFile string) (string, error) {
-	data, err := os.ReadFile(keyFile)
+func NewConfig() *Config {
+	return &Config{}
+}
+
+func (conf *Config) LoadEnv(fileEnv string) error {
+	err := godotenv.Load(fileEnv)
 	if err != nil {
-		return "", fmt.Errorf("Не удалось прочитать файл .env %s: %v", keyFile, err)
+		log.Panic("не удалось прочитать файл .env", err)
 	}
-	conf.Key = string(data)
-	return conf.Key, nil
+	conf.Key = os.Getenv("KEY")
+	return nil
+}
+
+func (conf *Config) GetKey() string {
+	return conf.Key
 }
