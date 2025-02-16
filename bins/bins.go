@@ -14,7 +14,7 @@ var BinList = []Bin{}
 type Bin struct {
 	Id        string    `json:"id"`
 	Private   bool      `json:"private"`
-	CreatedAt time.Time `json:"CreatedAt"`
+	CreatedAt time.Time `json:"createdAt"`
 	Name      string    `json:"name"`
 }
 
@@ -27,22 +27,32 @@ func (b *Bin) ToBytes() ([]byte, error) {
 	return file, nil
 }
 
-// Метод по добавлению bin в JSON
-func (b *Bin) AddBin(bin Bin) {
+// Метод по добавлению bin в JSON и метод по удалению(обновлению) JSON
+func (b *Bin) AddBin() error {
 	b.CreatedAt = time.Now()
 	data, err := b.ToBytes()
 	if err != nil {
-		fmt.Println("Ошибка преобразования")
+		return fmt.Errorf("Ошибка преобразования %v", err)
 	}
-	file.WriteFile(data, "data.json")
+	return file.WriteFile(data, "data.json")
+
+}
+
+type BinParams struct {
+	Id      string `json:"id"`
+	Private bool   `json:"private"`
+	Name    string `json:"name"`
 }
 
 // Функция по созданию нового Bin
-func NewBin(id string, private bool, name string) (*Bin, error) {
+func NewBin(params *BinParams) (*Bin, error) {
+	if params.Id == "" || params.Name == "" {
+		return nil, fmt.Errorf("Не введены значения для id и name")
+	}
 	return &Bin{
-		Id:        id,
-		Private:   private,
+		Id:        params.Id,
+		Private:   params.Private,
 		CreatedAt: time.Now(),
-		Name:      name,
+		Name:      params.Name,
 	}, nil
 }
