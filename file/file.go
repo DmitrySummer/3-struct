@@ -10,7 +10,7 @@ type File interface {
 	WriteFile([]byte, string)
 }
 
-// Функция записи файла и проверка является ли файл JSON
+// Функция записи и обновления файла
 func WriteFile(content []byte, name string) error {
 	if !json.Valid(content) {
 		return fmt.Errorf("некорректный JSON, ошибка записи")
@@ -19,8 +19,10 @@ func WriteFile(content []byte, name string) error {
 	var existingData []map[string]interface{}
 	if data, err := os.ReadFile(name); err == nil && len(data) > 0 {
 		if err := json.Unmarshal(data, &existingData); err != nil {
-			return fmt.Errorf("ошибка чтения JSON: %v", err)
+			return fmt.Errorf("ошибка декодирования JSON: %v", err)
 		}
+	} else {
+		existingData = []map[string]interface{}{}
 	}
 
 	var newData map[string]interface{}
@@ -28,14 +30,9 @@ func WriteFile(content []byte, name string) error {
 		return fmt.Errorf("ошибка декодирования JSON: %v", err)
 	}
 
-	id, exists := newData["id"]
-	if !exists {
-		return fmt.Errorf("JSON не содержит ключ 'id'")
-	}
-
 	found := false
 	for i, item := range existingData {
-		if item["id"] == id {
+		if id, ok := item["id"].(string); ok && id == newData["id"] {
 			existingData[i] = newData
 			found = true
 			break
